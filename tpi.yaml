@@ -31,8 +31,10 @@ blueprint:
       name: Température extérieure
       description: Sonde de mesure de la température extérieure
       selector:
-        filter:
-          - integration: met
+        entity:
+          multiple: true
+          filter:
+            - integration: met
     entity_temp_int:
       name: Température intérieure
       description: Sonde de mesure de la température intérieure (sensor)
