@@ -29,9 +29,10 @@ blueprint:
           domain: input_number
     entity_temp_ext:
       name: Température extérieure
-      description: Sonde de mesure de la température extérieure (sensor)
+      description: Sonde de mesure de la température extérieure
       selector:
-        entity:
+        filter:
+          - integration: met
     entity_temp_int:
       name: Température intérieure
       description: Sonde de mesure de la température intérieure (sensor)
