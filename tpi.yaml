@@ -46,12 +46,6 @@ blueprint:
       selector:
         entity:
           domain: input_number
-    entity_chauffage:
-      name: Chauffage
-      description: Interrupteur marche / arrêt du chauffage (switch)
-      selector:
-        entity:
-          domain: switch
     script_chauffage_on:
       name: Allumage chauffage
       description: Script d'allumage du chauffage
@@ -101,7 +95,7 @@ action:
   - choose:
       - conditions:
           - condition: template
-            value_template: '{{puissance <= 20}}'
+            value_template: '{{puissance <= 10}}'
         sequence:
           - alias: "run script"
             service: !input script_chauffage_off
