@@ -72,7 +72,6 @@ variables:
   coeff_c: !input coeff_c
   coeff_t: !input coeff_t
   entity_temp_int: !input entity_temp_int
-  entity_temp_ext: !input entity_temp_ext
 
 trigger:
   - platform: time_pattern
@@ -84,8 +83,8 @@ action:
   - alias: Récupération des données
     variables:
       entity_consigne: !input entity_consigne
-      consigne: "{{states(entity_consigne)}}"
-      temp_ext: '{{ states(entity_temp_ext) }}'
+      consigne: "{{ states(entity_consigne) }}"
+      temp_ext: "{{ weather_forecast.weather_provider.forecast[0]['temperature'] }}"
       temp_int: '{{ states(entity_temp_int) }}'    
       puissance: >-
         {%set val = coeff_c * (consigne - temp_int) + coeff_t * (consigne -
