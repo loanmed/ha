@@ -34,7 +34,7 @@ blueprint:
         entity:
           multiple: true
           filter:
-            - integration: met
+            integration: met
     entity_temp_int:
       name: Température intérieure
       description: Sonde de mesure de la température intérieure (sensor)
