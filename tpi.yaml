@@ -78,7 +78,7 @@ action:
     variables:
       entity_consigne: !input entity_consigne
       consigne: "{{ states(entity_consigne) }}"
-      temp_ext: "{{ entity_temp_int.weather_provider.forecast[0]['temperature'] }}"
+      temp_ext: "{{ state_attr('weather.meteo_maison', 'temperature') }}"
       temp_int: '{{ states(entity_temp_int) }}'    
       puissance: >-
         {%set val = coeff_c * (consigne - temp_int) + coeff_t * (consigne -
