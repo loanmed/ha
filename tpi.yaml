@@ -1,0 +1,124 @@
+blueprint:
+  name: Thermostat TPI
+  description: Thermostat TPI (Time Propertional & Integral)
+  domain: automation
+  source_url: https://github.com/argonaute199/chauffage-home-assistant/blob/main/blueprint/thermostat_tpi.yaml
+
+  input:
+    coeff_c:
+      name: Coefficient C
+      description: Coefficient multiplicateur de la différence entre la consigne et éa température intérieure pour le calcul de la puissance (0.6 conseillé)
+      selector:
+        number:
+          min: 0.0
+          max: 1.0
+          step: 0.01
+    coeff_t:
+      name: Coefficient T
+      description: Coefficient multiplicateur de la différence entre la consigne et éa température extérieure pour le calcul de la puissance (0.01 conseillé)
+      selector:
+        number:
+          min: 0.0
+          max: 0.1
+          step: 0.001
+    entity_consigne:
+      name: Consigne
+      description: Champs d'entrée de la température de consigne (input number).
+      selector:
+        entity:
+          domain: input_number
+    entity_temp_ext:
+      name: Température extérieure
+      description: Sonde de mesure de la température extérieure (sensor)
+      selector:
+        entity:
+          domain: weather
+          device_class: temperature
+    entity_temp_int:
+      name: Température intérieure
+      description: Sonde de mesure de la température intérieure (sensor)
+      selector:
+        entity:
+          domain: sensor
+          device_class: temperature
+    entity_puissance:
+      name: Puissance
+      description: Champs d'affichage de la puissance (input_number)
+      selector:
+        entity:
+          domain: input_number
+    entity_chauffage:
+      name: Chauffage
+      description: Interrupteur marche / arrêt du chauffage (switch)
+      selector:
+        entity:
+          domain: switch
+    script_chauffage_on:
+      name: Allumage chauffage
+      description: Script d'allumage du chauffage
+      selector:
+        entity:
+          filter:
+            domain: script
+    script_chauffage_off:
+      name: Allumage chauffage
+      description: Script d'extinction du chauffage
+      selector:
+        entity:
+          filter:
+            domain: script
+
+# Récupération des paramètres
+variables:
+  coeff_c: !input coeff_c
+  coeff_t: !input coeff_t
+  entity_temp_int: !input entity_temp_int
+  entity_temp_ext: !input entity_temp_ext
+
+trigger:
+  - platform: time_pattern
+    minutes: "/10"
+  - platform: state
+    entity_id: !input entity_consigne
+
+action:
+  - alias: récupération des données
+    variables:
+      entity_consigne: !input entity_consigne
+      consigne: "{{states(entity_consigne)}}"
+      temp_ext: '{{ states(entity_temp_ext) }}'
+      temp_int: '{{ states(entity_temp_int) }}'    
+      puissance: >-
+        {%set val = coeff_c * (consigne - temp_int) + coeff_t * (consigne -
+        temp_ext) %}  {% if val > 1 %} {% set val = 100 %}  {% elif val < 0 %} 
+        {% set val = 0 %}  {% else %} {% set val = ( (val *
+        100) | round(0)) %} {% endif %} {{val}}
+      temps_chauffe: '{{ puissance * 6 }}'
+  - alias: Met à jour l'indicateur de puissance
+    service: input_number.set_value
+    target:
+      entity_id: !input entity_puissance
+    data:
+      value: '{{puissance}}'  
+  - choose:
+      - conditions:
+          - condition: template
+            value_template: '{{puissance <= 20}}'
+        sequence:
+          - alias: "run script"
+            service: !input script_chauffage_off
+      - conditions:
+          - condition: template
+            value_template: '{{ puissance > 99}}'
+        sequence:
+          - alias: "run script"
+            service: !input script_chauffage_on
+    default:
+      - alias: "run script"
+        service: !input script_chauffage_on
+      - delay: '{{temps_chauffe}}'
+      - alias: "run script"
+        service: !input script_chauffage_off
+mode: restart
+
+mode: restart
