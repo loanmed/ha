@@ -29,12 +29,10 @@ blueprint:
           domain: input_number
     entity_temp_ext:
       name: Température extérieure
-      description: Sonde de mesure de la température extérieure
+      description: Fournisseur météo de la température extérieure
       selector:
         entity:
-          multiple: true
-          filter:
-            integration: met
+          domain: weather
     entity_temp_int:
       name: Température intérieure
       description: Sonde de mesure de la température intérieure (sensor)
@@ -83,7 +81,7 @@ trigger:
     entity_id: !input entity_consigne
 
 action:
-  - alias: récupération des données
+  - alias: Récupération des données
     variables:
       entity_consigne: !input entity_consigne
       consigne: "{{states(entity_consigne)}}"
