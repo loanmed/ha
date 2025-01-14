@@ -69,7 +69,7 @@ variables:
 
 trigger:
   - platform: time_pattern
-    minutes: "/10"
+    minutes: "/15"
   - platform: state
     entity_id: !input entity_consigne
 
@@ -85,7 +85,7 @@ action:
         temp_ext) %}  {% if val > 1 %} {% set val = 100 %}  {% elif val < 0 %} 
         {% set val = 0 %}  {% else %} {% set val = ( (val *
         100) | round(0)) %} {% endif %} {{val}}
-      temps_chauffe: '{{ puissance * 6 }}'
+      temps_chauffe: '{{ puissance * 9 }}'
   - alias: Met à jour l'indicateur de puissance
     service: input_number.set_value
     target:
