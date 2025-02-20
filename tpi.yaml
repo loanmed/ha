@@ -95,7 +95,7 @@ action:
   - choose:
       - conditions:
           - condition: template
-            value_template: '{{puissance <= 10}}'
+            value_template: '{{puissance <= 15}}'
         sequence:
           - alias: "run script"
             service: !input script_chauffage_off
